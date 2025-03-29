@@ -10,7 +10,7 @@ const authRouter = express.Router();
 authRouter.post("/register", async (req, res) => {
   try {
     const { name, email, password, address, role } = req.body;
-    //console.log(name, email, password, address, role);
+
     if (!email || !password) {
       return res.status(400).json({
         status: "error",
@@ -19,13 +19,12 @@ authRouter.post("/register", async (req, res) => {
     }
 
     const existingUser = await database.getUser(email);
-    
     if (existingUser) {
-        return res
+      return res
         .status(409)
         .json({ status: "error", message: "User already exists." });
     }
-    console.log(1);
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await database.createUser(name, email, hashedPassword, address, role);
@@ -35,7 +34,7 @@ authRouter.post("/register", async (req, res) => {
       .json({ status: "success", message: "User registered successfully." });
   } catch (error) {
     return res.status(500).json({
-      status: "error",
+      status: error,
       message: "Internal Server Error. Please try again later.",
     });
   }
@@ -51,7 +50,8 @@ authRouter.post("/login", async (req, res) => {
   }
 
   try {
-    const user = await store.getUser(email);
+    const user = await database.getUser(email);
+    console.log(1);
     if (!user) {
       return res.status(400).json({
         status: "error",
@@ -89,7 +89,7 @@ authRouter.post("/login", async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({
-      status: "error",
+      status: error,
       message: "Internal Server Error. Please try again later.",
     });
   }

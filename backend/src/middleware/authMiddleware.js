@@ -4,6 +4,7 @@ require("dotenv").config();
 const authenticateToken = (req, res, next) => {
   try {
     const jwtToken = req.cookies?.authToken;
+    console.log(jwtToken);
 
     if (!jwtToken) {
       return res
@@ -15,22 +16,17 @@ const authenticateToken = (req, res, next) => {
     if (!secretKey) {
       throw new Error("Secret key is missing from environment variables");
     }
-    const decoded = jwt.verify(jwtToken, secretKey, (error, payload) => {
+    jwt.verify(jwtToken, secretKey, (error, payload) => {
       if (error) {
         return res.status(401).json({ status: "error", message: error });
       }
-      req.user = decoded;
+      req.user = payload;
       next();
     });
   } catch (error) {
+    console.log(error.message);
     return res.status(500).json({ status: "error", message: error.message });
   }
 };
 
-const roleMiddleware = (role) => (req, res, next) => {
-  if (req.user?.role !== role)
-    return res.status(403).json({ message: "Access denied" });
-  next();
-};
-
-module.exports = { authenticateToken, roleMiddleware };
+module.exports = { authenticateToken };
