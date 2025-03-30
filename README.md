@@ -22,9 +22,9 @@ A web application for rating and reviewing stores. Users can browse stores, leav
   VITE_API_URL=https://localhost:3001/
   ```
 
-## 🛠 Technologies Used
+## Technologies Used
 
-### 🔹 **Frontend**
+### **Frontend**
 - **Framework**: React (with TypeScript & Vite)
 - **State Management**: Context API
 - **Styling**: Tailwind CSS
@@ -32,20 +32,17 @@ A web application for rating and reviewing stores. Users can browse stores, leav
 - **HTTP Requests**: Axios
 - **Authentication**: JWT-based authentication
 
-### 🔹 **Backend**
+### **Backend**
 - **Runtime**: Node.js
 - **Framework**: Express.js (with TypeScript)
 - **Database**: MySQL (via Avien)
 - **Authentication**: JWT & Bcrypt for hashing
 - **API Testing**: Postman
 
-### 🔹 **Deployment**
+### **Deployment**
 - **Frontend**: Vercel
 - **Backend**: Render
 - **Database**: Avien
-
----
-This project follows **MVC architecture** and ensures **secure authentication** using JWT and encrypted passwords. 🚀
 
 
 ## **Prerequisites**
