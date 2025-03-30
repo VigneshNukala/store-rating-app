@@ -13,11 +13,22 @@ import cors from 'cors';
 const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://your-frontend-url.com",
+];
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    methods: "GET,POST,PUT,DELETE,PATCH",
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
+    methods: "GET,POST,PUT,DELETE",
   })
 );
 app.use(cookieParser());

@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "dev": "nodemon --ext ts-node --exec \"node --experimental-specifier-resolution=node --loader ts-node/esm src/index.ts\"",
+    "dev": "nodemon --exec ts-node  src/index.ts",
     "build": "tsc",
     "clean": "rm -rf dist",
     "lint": "eslint . --ext .ts",
@@ -15,7 +15,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
+  "type": "commonjs",
   "description": "",
   "dependencies": {
     "@types/express": "^5.0.1",
