@@ -2,7 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRole } from "../context/RoleContext";
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from "../context/AuthContext";
 
 const Signin = () => {
   const [email, setEmail] = useState("");
@@ -13,7 +13,10 @@ const Signin = () => {
   const { setRole } = useRole();
   const { login } = useAuth();
 
-  const handleSignIn = async (credentials: { email: string; password: string; }) => {
+  const handleSignIn = async (credentials: {
+    email: string;
+    password: string;
+  }) => {
     try {
       const response = await axios.post(
         "http://localhost:3001/auth/signin",
@@ -22,13 +25,15 @@ const Signin = () => {
       );
 
       console.log("Signin successful:", response.data);
-      
+
       // Make sure we're getting the correct token from response
       const token = response.data.token || response.data.data.token;
       const role = response.data.data.role;
-      
+
       // Store token with Bearer prefix if not already included
-      const tokenWithBearer = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+      const tokenWithBearer = token.startsWith("Bearer ")
+        ? token
+        : `Bearer ${token}`;
       login(tokenWithBearer, role);
       setRole(role);
 
@@ -43,7 +48,7 @@ const Signin = () => {
         } else if (role === "user") {
           navigate("/user");
         } else if (role === "owner") {
-          navigate("/store-owner");
+          navigate("/owner"); // Changed from /owner to /store-owner
         }
       }
     } catch (error: unknown) {

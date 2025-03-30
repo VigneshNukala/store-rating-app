@@ -1,64 +1,92 @@
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useLocation } from "react-router-dom";
+import { Disclosure } from "@headlessui/react";
+import {
+  ChartBarIcon,
+  UserGroupIcon,
+  BuildingStorefrontIcon,
+  UserPlusIcon,
+  PlusCircleIcon,
+  Bars3Icon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+import { useState } from "react";
 import Navbar from "../Navbar";
 
-const AdminLayout = () => {
-  return (
-    <>
-      <Navbar />
-      <div className="flex h-screen">
-        {/* Sidebar */}
-        <aside className="w-64 bg-gray-100 p-4 border-r">
-          <h2 className="text-xl font-semibold mb-4">Admin Panel</h2>
-          <ul className="space-x-4">
-            <li>
-              <Link
-                to="/admin/stats"
-                className="block p-2 rounded hover:bg-gray-200 "
-              >
-                Statistics
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/admin/add-store"
-                className="block p-2 rounded hover:bg-gray-200"
-              >
-                Add Store
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/admin/update-role"
-                className="block p-2 rounded hover:bg-gray-200"
-              >
-                Update User Role
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/admin/users"
-                className="block p-2 rounded hover:bg-gray-200"
-              >
-                User List
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/admin/delete-user"
-                className="block p-2 rounded hover:bg-gray-200"
-              >
-                Delete User
-              </Link>
-            </li>
-          </ul>
-        </aside>
+const navigation = [
+  { name: "Statistics", href: "/admin/stats", icon: ChartBarIcon },
+  { name: "Stores List", href: "/admin/stores", icon: BuildingStorefrontIcon },
+  { name: "Add User", href: "/admin/add-user", icon: UserPlusIcon },
+  { name: "Add Store", href: "/admin/add-store", icon: PlusCircleIcon },
+  { name: "User List", href: "/admin/users", icon: UserGroupIcon },
+];
 
-        {/* Main Content */}
-        <main className="flex-1 p-6">
+const AdminLayout = () => {
+  const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  return (
+    <div className="min-h-screen bg-white">
+      <Navbar />
+      <div className="flex flex-col md:flex-row">
+        {/* Mobile menu button */}
+        <button
+          className="md:hidden fixed top-16 left-4 z-50 p-2 rounded-md bg-white border border-gray-200"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
+          {sidebarOpen ? (
+            <XMarkIcon className="h-6 w-6 text-gray-600" />
+          ) : (
+            <Bars3Icon className="h-6 w-6 text-gray-600" />
+          )}
+        </button>
+
+        <Disclosure
+          as="nav"
+          className={`${
+            sidebarOpen ? "block" : "hidden"
+          } md:block fixed md:static w-64 bg-white border-r border-gray-200 h-screen z-40`}
+        >
+          {() => (
+            <>
+              <div className="p-4">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Admin Panel
+                </h2>
+                <div className="mt-5 space-y-1">
+                  {navigation.map((item) => {
+                    const isActive = location.pathname === item.href;
+                    return (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        className={`${
+                          isActive
+                            ? "bg-primary-100 text-primary-900"
+                            : "text-gray-600 hover:bg-gray-50"
+                        } group flex items-center px-3 py-2 text-sm font-medium rounded-md`}
+                      >
+                        <item.icon
+                          className={`${
+                            isActive
+                              ? "text-primary-900"
+                              : "text-gray-400 group-hover:text-gray-500"
+                          } mr-3 flex-shrink-0 h-6 w-6`}
+                        />
+                        {item.name}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
+        </Disclosure>
+
+        <main className="flex-1 p-4 md:p-8 md:ml-0">
           <Outlet />
         </main>
       </div>
-    </>
+    </div>
   );
 };
 

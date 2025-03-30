@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
-type Role = "admin" | "user" | "store-owner" | "";
+type Role = "admin" | "user" | "owner" | "";
 
 interface RoleContextType {
   role: Role;

@@ -11,19 +11,22 @@ import Signin from "./components/Signin";
 import AdminLayout from "./components/admin/AdminLayout";
 import Statistics from "./components/admin/Statistics";
 import AddStore from "./components/admin/AddStore";
-import UpdateUserRole from "./components/admin/UpdateUserRole";
+import AddUser from "./components/admin/AddUser";
+
 import UserList from "./components/admin/UserList";
-import DeleteUser from "./components/admin/DeleteUser";
+import StoresList from "./components/admin/StoresList";
 
 import UserLayout from "./components/user/UserLayout";
 import StoreList from "./components/user/StoreList";
 import StoreDetails from "./components/user/StoreDetails";
 import SubmitRating from "./components/user/SubmitRating";
 import UpdateRating from "./components/user/UpdateRating";
-import StoreRatings from "./components/user/StoreRatings";
-import UserRatings from "./components/user/UserRatings";
+import UsersList from "./components/user/UsersList";
 
 import OwnerLayout from "./components/store-owner/OwnerLayout";
+import ChangePassword from "./components/store-owner/ChangePassword";
+import StoreRatings from "./components/store-owner/StoreRatings";
+import OwnerStatistics from "./components/store-owner/Statistics";
 
 const App = () => {
   return (
@@ -47,9 +50,9 @@ const App = () => {
             >
               <Route path="stats" element={<Statistics />} />
               <Route path="add-store" element={<AddStore />} />
-              <Route path="update-role" element={<UpdateUserRole />} />
+              <Route path="add-user" element={<AddUser />} />
               <Route path="users" element={<UserList />} />
-              <Route path="delete-user" element={<DeleteUser />} />
+              <Route path="stores" element={<StoresList />} />
             </Route>
 
             {/* User Routes */}
@@ -63,31 +66,24 @@ const App = () => {
             >
               <Route path="stores" element={<StoreList />} />
               <Route path="stores/:id" element={<StoreDetails />} />
+              <Route path="submit-rating/:id" element={<SubmitRating />} />
+              <Route path="update-rating/:id" element={<UpdateRating />} />
+              <Route path="users" element={<UsersList />} />
             </Route>
 
             {/* Store Owner Routes */}
             <Route
-              path="/store-owner"
+              path="/owner"
               element={
-                <ProtectedRoute requiredRole="store-owner">
+                <ProtectedRoute requiredRole="owner">
                   <OwnerLayout />
                 </ProtectedRoute>
               }
-            ></Route>
-
-            {/* New User Routes */}
-            <Route path="/users/stores" element={<StoreList />} />
-            <Route path="/users/stores/:id" element={<StoreDetails />} />
-            <Route path="/users/submit-rating" element={<SubmitRating />} />
-            <Route path="/users/update-rating" element={<UpdateRating />} />
-            <Route
-              path="/users/ratings/store/:storeId"
-              element={<StoreRatings />}
-            />
-            <Route
-              path="/users/ratings/user/:userId"
-              element={<UserRatings />}
-            />
+            >
+              <Route path="password" element={<ChangePassword />} />
+              <Route path="ratings" element={<StoreRatings />} />
+              <Route path="statistics" element={<OwnerStatistics />} />
+            </Route>
           </Routes>
         </Router>
       </RoleProvider>

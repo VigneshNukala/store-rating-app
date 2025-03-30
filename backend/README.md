@@ -9,41 +9,59 @@ Most endpoints require JWT authentication. Include the token in the Authorizatio
 
 ## Endpoints
 
-### Authentication
+### Authentication Routes
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/auth/register` | Register new user | No |
-| POST | `/auth/login` | Login user | No |
-| POST | `/auth/logout` | Logout user | Yes |
-| PUT | `/auth/password` | Update password | Yes |
-
-### User Routes
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/users/stores` | Get all stores with filters | Yes |
-| GET | `/users/stores/:id` | Get store details | Yes |
-| GET | `/users/ratings/store/:storeId` | Get all ratings for a store | Yes |
-| GET | `/users/ratings/user/:userId` | Get all ratings by a user | Yes |
-| POST | `/users/rating` | Submit a rating | Yes |
-| PATCH | `/users/rating/:id` | Update existing rating | Yes |
-
-### Store Owner Routes
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/owner/ratings` | Get ratings for owned store | Yes |
-| GET | `/owner/average-rating` | Get store's average rating | Yes |
+| POST | `/auth/signup` | Register new user | No |
+| POST | `/auth/signin` | Login user | No |
+| GET | `/auth/verify` | Verify auth token | Yes |
 
 ### Admin Routes
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/admin/dashboard` | Get dashboard statistics | Yes |
-| GET | `/admin/users` | Get all users with filters | Yes |
-| GET | `/admin/stores` | Get all stores with filters | Yes |
-| POST | `/admin/stores` | Create new store | Yes |
-| POST | `/admin/users` | Create new user | Yes |
-| PUT | `/admin/users/:email` | Update user role | Yes |
-| DELETE | `/admin/users/:email` | Delete user | Yes |
+| POST | `/admin/add-store` | Add a new store | Yes |
+| POST | `/admin/user` | Create new user | Yes |
+| GET | `/admin/stats` | Get dashboard statistics | Yes |
+| GET | `/admin/stores` | Get stores with filters | Yes |
+| GET | `/admin/users` | Get users with filters | Yes |
+| GET | `/admin/store-owners` | Get store owners with ratings | Yes |
 
+### User Routes
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/users/users` | Get list of all users | Yes |
+| GET | `/users/stores` | Get list of all stores with search | Yes |
+| GET | `/users/stores/:id` | Get store details | Yes |
+| POST | `/users/rating` | Submit a rating | Yes |
+| POST | `/users/rating/:id` | Update existing rating | Yes |
+
+### Store Owner Routes
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/owner/update-password` | Update password | Yes |
+| GET | `/owner/ratings` | Get ratings for owned store | Yes |
+| GET | `/owner/average-ratings` | Get average ratings of the stores of owner | Yes |
+
+## API Response Format
+
+All API endpoints return responses in the following format:
+
+```json
+{
+  "status": "success" | "error",
+  "data": any | null,
+  "message": string | null
+}
+```
+
+## Authentication
+
+Protected routes require a JWT token in the Authorization header:
+```
+Authorization: Bearer <token>
+```
+
+The token is obtained upon successful signin and should be included in subsequent requests to protected endpoints.
 
 ## Store Filters
 
@@ -54,10 +72,6 @@ Most endpoints require JWT authentication. Include the token in the Authorizatio
 | address | Filter stores by address | No |
 | sortBy | Field to sort results by | No |
 | sortOrder | Sort direction ("ASC" or "DESC") | No |
-
-### Example Request
-
-
 
 ## Input Validation
 

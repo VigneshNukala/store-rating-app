@@ -2,83 +2,72 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
-interface User {
+interface Store {
   id: number;
   name: string;
   email: string;
-  role: string;
+  address: string;
+  averageRating: number;
 }
 
-const UserList = () => {
-  const [users, setUsers] = useState<User[]>([]);
+const StoresList = () => {
+  const [stores, setStores] = useState<Store[]>([]);
   const [error, setError] = useState("");
-  const [nameSearch, setNameSearch] = useState("");
-  const [roleSearch, setRoleSearch] = useState("");
-  const [emailSearch, setEmailSearch] = useState("");
+  const [search, setSearch] = useState("");
+  const [address, setAddress] = useState("");
 
-  const fetchUsers = useCallback(async () => {
+  const fetchStores = useCallback(async () => {
     try {
       setError("");
       const response = await axios.get(
-        `http://localhost:3001/admin/users?name=${nameSearch}&role=${roleSearch}&email=${emailSearch}`,
+        `http://localhost:3001/admin/stores?name=${search}&address=${address}`,
         {
           withCredentials: true,
         }
       );
-      setUsers(response.data.data);
+      console.log("Fetched stores:", response.data.data);
+      setStores(response.data.data);
     } catch (error) {
-      setError("Failed to fetch users");
-      console.error("Error fetching users:", error);
+      setError("Failed to fetch stores");
+      console.error("Error fetching stores:", error);
     }
-  }, [nameSearch, roleSearch, emailSearch]);
+  }, [search, address]);
 
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
-      fetchUsers();
+      fetchStores();
     }, 300);
 
     return () => clearTimeout(debounceTimer);
-  }, [nameSearch, roleSearch, emailSearch, fetchUsers]);
+  }, [search, address, fetchStores]);
 
   return (
     <div className="space-y-6">
       <div className="sm:flex sm:items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Users Management</h2>
+        <h2 className="text-2xl font-bold text-gray-900">Stores Management</h2>
 
-        <div className="flex gap-4 flex-wrap">
-          <div className="mt-4 sm:mt-0 relative rounded-md shadow-sm">
+        <div className="flex gap-4">
+          <div className="mt-4 sm:mt-0 relative rounded-md shadow-sm max-w-xs">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
             </div>
             <input
               type="text"
               placeholder="Search by name..."
-              value={nameSearch}
-              onChange={(e) => setNameSearch(e.target.value)}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               className="block w-full rounded-md border-0 py-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-primary-600 sm:text-sm"
             />
           </div>
-          <div className="mt-4 sm:mt-0 relative rounded-md shadow-sm">
+          <div className="mt-4 sm:mt-0 relative rounded-md shadow-sm max-w-xs">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
             </div>
             <input
               type="text"
-              placeholder="Search by role..."
-              value={roleSearch}
-              onChange={(e) => setRoleSearch(e.target.value)}
-              className="block w-full rounded-md border-0 py-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-primary-600 sm:text-sm"
-            />
-          </div>
-          <div className="mt-4 sm:mt-0 relative rounded-md shadow-sm">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search by email..."
-              value={emailSearch}
-              onChange={(e) => setEmailSearch(e.target.value)}
+              placeholder="Search by address..."
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
               className="block w-full rounded-md border-0 py-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-primary-600 sm:text-sm"
             />
           </div>
@@ -92,30 +81,41 @@ const UserList = () => {
       )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {users.map((user, index) => (
+        {stores.map((store, index) => (
           <div
-            key={user.id}
+            key={store.id}
             className={`${
-              index % 2 === 0 ? "bg-white" : "bg-gray-50"
+              index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
             } overflow-hidden shadow-lg rounded-lg divide-y divide-gray-200 border-2 border-gray-200 hover:border-primary-500 transition-colors duration-200`}
           >
             <div className="px-4 py-5 sm:px-6">
               <h3 className="text-lg font-medium leading-6 text-gray-900 flex items-center justify-between">
-                {user.name}
-                <span className="text-sm bg-gray-100 px-2 py-1 rounded-full">
-                  #{user.id}
-                </span>
+                {store.name}
+                <span className="text-sm bg-gray-100 px-2 py-1 rounded-full">#{store.id}</span>
               </h3>
-              <p className="mt-1 text-sm text-gray-500">{user.email}</p>
+              <p className="mt-1 text-sm text-gray-500">{store.email}</p>
             </div>
             <div className="px-4 py-4 sm:px-6">
-              <dl>
+              <dl className="grid grid-cols-1 gap-x-4 gap-y-4">
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Role</dt>
+                  <dt className="text-sm font-medium text-gray-500">Address</dt>
                   <dd className="mt-1 text-sm text-gray-900">
-                    <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">
-                      {user.role}
-                    </span>
+                    {store.address}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">
+                    Average Rating
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    {store.averageRating ? (
+                      <span className="flex items-center">
+                        {store.averageRating.toFixed(1)}
+                        <span className="ml-1 text-yellow-400">★</span>
+                      </span>
+                    ) : (
+                      "No ratings yet"
+                    )}
                   </dd>
                 </div>
               </dl>
@@ -127,4 +127,4 @@ const UserList = () => {
   );
 };
 
-export default UserList;
+export default StoresList;

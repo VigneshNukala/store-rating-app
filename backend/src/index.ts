@@ -31,7 +31,7 @@ const startServer = async () => {
     app.use("/auth", authRouter);
     app.use("/admin", authenticateToken, adminRouter);
     app.use("/user", userRouter);
-    app.use("/store-owner", authenticateToken, storeOwnerRouter);
+    app.use("/owner", authenticateToken, storeOwnerRouter);
 
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);

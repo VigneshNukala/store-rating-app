@@ -83,10 +83,10 @@ authRouter.post(
       );
 
       res.cookie("authToken", jwtToken, {
-        httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
-        secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Adjust for cross-origin requests
-        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 24 * 60 * 60 * 1000,
       });
 
       res.status(200).json(
@@ -106,10 +106,7 @@ authRouter.post(
 authRouter.get(
   "/verify",
   authenticateToken,
-  async (
-    req: Request,
-    res: Response<ApiResponse<string>>
-  ) => {
+  async (req: Request, res: Response<ApiResponse<string>>) => {
     try {
       const user = (req as any).user;
 
@@ -129,46 +126,14 @@ authRouter.get(
   }
 );
 
-// **UPDATE PASSWORD** Route
-authRouter.post(
-  "/update-password",
-  async (req: Request, res: Response<ApiResponse<string>>) => {
-    try {
-      const { email, currentPassword, newPassword } = req.body;
-
-      if (!email || !currentPassword || !newPassword) {
-        res
-          .status(400)
-          .json(
-            error("Email, current password, and new password are required.")
-          );
-        return;
-      }
-
-      const user = await database.getUser(email);
-      if (!user) {
-        res.status(404).json(error("User not found."));
-        return;
-      }
-
-      const isPasswordMatched = await bcrypt.compare(
-        currentPassword,
-        user.password
-      );
-      if (!isPasswordMatched) {
-        res.status(400).json(error("Current password is incorrect."));
-        return;
-      }
-
-      const hashedPassword = await hashPassword(newPassword);
-      await database.updateUserPassword(email, hashedPassword);
-
-      res.status(200).json(success("Password updated successfully."));
-    } catch (err) {
-      console.error("Update password error:", err);
-      res.status(500).json(error("Internal Server Error."));
-    }
-  }
-);
+// Logout Route
+authRouter.post("/logout", (req: Request, res: Response) => {
+  res.clearCookie("authToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  });
+  res.status(200).json({ message: "Logged out successfully" });
+});
 
 export default authRouter;

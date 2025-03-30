@@ -21,7 +21,6 @@ const authenticateToken = (
 ) => {
   try {
     const jwtToken = req.cookies?.authToken;
-    console.log(jwtToken);
 
     if (!jwtToken) {
       res

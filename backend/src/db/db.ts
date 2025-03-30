@@ -1,9 +1,14 @@
-import { Pool, PoolConnection, RowDataPacket, ResultSetHeader } from "mysql2/promise";
+import {
+  Pool,
+  PoolConnection,
+  RowDataPacket,
+  ResultSetHeader,
+} from "mysql2/promise";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-type Role = "Admin" | "User" | "Owner"
+type Role = "Admin" | "User" | "Owner";
 
 interface User {
   id: number;
@@ -12,10 +17,11 @@ interface User {
   password: string;
   address: string | null;
   role: Role;
-  created_at: string; // or Date if using Date objects
+  created_at: string;
 }
 
 interface Store {
+  ownerEmail: string;
   id: number;
   name: string;
   email: string;
@@ -24,14 +30,55 @@ interface Store {
 }
 
 class StoreRating {
-  async updateUserPassword(email: string, hashedPassword: string): Promise<void> {
+  async getRatingsByStoreWithUsers(storeId: string): Promise<any[]> {
     if (!this.db) throw new Error("Database not connected");
-    
-    await this.db.execute(
-      "UPDATE users SET password = ? WHERE email = ?",
-      [hashedPassword, email]
+
+    const [rows] = await this.db!.execute<RowDataPacket[]>(
+      `SELECT 
+        r.*,
+        u.name as user_name,
+        u.email as user_email,
+        u.role as user_role,
+        (SELECT AVG(r2.rating) 
+         FROM ratings r2 
+         JOIN stores s ON r2.store_id = s.id 
+         WHERE s.email = u.email AND u.role = 'owner') as owner_avg_rating
+      FROM ratings r
+      JOIN users u ON r.user_id = u.id
+      WHERE r.store_id = ?
+      ORDER BY r.created_at DESC`,
+      [storeId]
     );
+
+    return rows;
   }
+
+  async getStoreOwnerById(storeId: string): Promise<User | null> {
+    if (!this.db) throw new Error("Database not connected");
+
+    const [rows] = await this.db!.execute<RowDataPacket[]>(
+      `SELECT u.* 
+       FROM users u
+       JOIN stores s ON s.email = u.email
+       WHERE s.id = ? AND u.role = 'owner'`,
+      [storeId]
+    );
+
+    return rows.length > 0 ? (rows[0] as User) : null;
+  }
+
+  async updateUserPassword(
+    email: string,
+    hashedPassword: string
+  ): Promise<void> {
+    if (!this.db) throw new Error("Database not connected");
+
+    await this.db.execute("UPDATE users SET password = ? WHERE email = ?", [
+      hashedPassword,
+      email,
+    ]);
+  }
+
   private db: Pool | null = null;
 
   // Create database connection
@@ -106,7 +153,13 @@ class StoreRating {
     }
   }
 
-  async createUser(name: string, email: string, hashedPassword: string, address: string, role: string): Promise<void> {
+  async createUser(
+    name: string,
+    email: string,
+    hashedPassword: string,
+    address: string,
+    role: string
+  ): Promise<void> {
     if (!this.db) throw new Error("Database not connected");
     await this.db.execute(
       "INSERT INTO users (name, email, password, address, role) VALUES (?, ?, ?, ?, ?)",
@@ -142,25 +195,34 @@ class StoreRating {
     return email ? userList[0] || null : null;
   }
 
-  async createStore(name: string, email: string, address: string): Promise<number> {
+  async createStore(
+    name: string,
+    email: string,
+    address: string
+  ): Promise<number> {
     if (!this.db) throw new Error("Database not connected");
-    
+
     const [result] = await this.db.execute<ResultSetHeader>(
       "INSERT INTO stores (name, email, address) VALUES (?, ?, ?)",
       [name, email, address]
     );
-    
+
     return result.insertId;
   }
 
   // Update getAllStores method
-  async getAllStores(filters?: { name?: string; address?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC' }): Promise<Store[]> {
+  async getAllStores(filters?: {
+    name?: string;
+    address?: string;
+    sortBy?: string;
+    sortOrder?: "ASC" | "DESC";
+  }): Promise<Store[]> {
     if (!this.db) throw new Error("Database not connected");
-    
+
     let query = "SELECT * FROM stores";
     const params: string[] = [];
     const conditions: string[] = [];
-  
+
     if (filters) {
       if (filters.name) {
         conditions.push("name LIKE ?");
@@ -171,20 +233,24 @@ class StoreRating {
         params.push(`%${filters.address}%`);
       }
     }
-  
+
     if (conditions.length > 0) {
       query += ` WHERE ${conditions.join(" AND ")}`;
     }
-  
+
     if (filters?.sortBy) {
-      query += ` ORDER BY ${filters.sortBy} ${filters.sortOrder || 'ASC'}`;
+      query += ` ORDER BY ${filters.sortBy} ${filters.sortOrder || "ASC"}`;
     }
-  
+
     const [rows] = await this.db.execute<RowDataPacket[]>(query, params);
     return rows as Store[];
   }
 
-  async submitRating(storeId: number, rating: number, userId: number): Promise<void> {
+  async submitRating(
+    storeId: number,
+    rating: number,
+    userId: number
+  ): Promise<void> {
     if (!this.db) throw new Error("Database not connected");
     await this.db.execute(
       "INSERT INTO ratings (user_id, store_id, rating) VALUES (?, ?, ?)",
@@ -192,7 +258,11 @@ class StoreRating {
     );
   }
 
-  async updateRating(storeId: number, rating: number, userId: number): Promise<void> {
+  async updateRating(
+    storeId: number,
+    rating: number,
+    userId: number
+  ): Promise<void> {
     if (!this.db) throw new Error("Database not connected");
     await this.db.execute(
       "UPDATE ratings SET rating = ? WHERE user_id = ? AND store_id = ?",
@@ -202,7 +272,7 @@ class StoreRating {
 
   async getAverageRating(storeId: string): Promise<any[]> {
     if (!this.db) throw new Error("Database not connected");
-    
+    console.log("Hello")
     const [rows] = await this.db.execute<RowDataPacket[]>(
       `SELECT 
         AVG(rating) as average_rating,
@@ -213,56 +283,70 @@ class StoreRating {
        WHERE store_id = ?`,
       [storeId]
     );
-    
+    console.log(rows);
     return rows;
   }
 
   async getStore(storeId?: number, email?: string): Promise<Store | null> {
     if (!this.db) throw new Error("Database not connected");
-  
+
     let query = "SELECT * FROM stores";
     const params: (number | string)[] = [];
     const conditions: string[] = [];
-  
+
     if (storeId) {
       conditions.push("id = ?");
       params.push(storeId);
     }
-  
+
     if (email) {
       conditions.push("email = ?");
       params.push(email);
     }
-  
+
     if (conditions.length > 0) {
       query += ` WHERE ${conditions.join(" AND ")}`;
     }
-  
+
     const [stores] = await this.db.execute<RowDataPacket[]>(query, params);
     const storeList = stores as Store[];
-  
+
     return storeList.length > 0 ? storeList[0] : null;
   }
 
   // For Admin Dashboard
-  async getDashboardStats(): Promise<{ totalUsers: number; totalStores: number; totalRatings: number }> {
+  async getDashboardStats(): Promise<{
+    totalUsers: number;
+    totalStores: number;
+    totalRatings: number;
+  }> {
     if (!this.db) throw new Error("Database not connected");
-    
-    const [userCount] = await this.db.execute<RowDataPacket[]>("SELECT COUNT(*) as count FROM users");
-    const [storeCount] = await this.db.execute<RowDataPacket[]>("SELECT COUNT(*) as count FROM stores");
-    const [ratingCount] = await this.db.execute<RowDataPacket[]>("SELECT COUNT(*) as count FROM ratings");
-    
+
+    const [userCount] = await this.db.execute<RowDataPacket[]>(
+      "SELECT COUNT(*) as count FROM users"
+    );
+    const [storeCount] = await this.db.execute<RowDataPacket[]>(
+      "SELECT COUNT(*) as count FROM stores"
+    );
+    const [ratingCount] = await this.db.execute<RowDataPacket[]>(
+      "SELECT COUNT(*) as count FROM ratings"
+    );
+
     return {
       totalUsers: userCount[0].count,
       totalStores: storeCount[0].count,
-      totalRatings: ratingCount[0].count
+      totalRatings: ratingCount[0].count,
     };
   }
 
   // Get all users with filters
-  async getAllUsers(filters?: { name?: string; email?: string; role?: string }): Promise<User[]> {
+  async getAllUsers(filters?: {
+    name?: string;
+    email?: string;
+    role?: string;
+  }): Promise<User[]> {
     if (!this.db) throw new Error("Database not connected");
-    
+
     let query = "SELECT id, name, email, address, role FROM users";
     const params: string[] = [];
     const conditions: string[] = [];
@@ -293,19 +377,19 @@ class StoreRating {
   // Get user by ID
   async getUserById(userId: number): Promise<User | null> {
     if (!this.db) throw new Error("Database not connected");
-    
+
     const [rows] = await this.db.execute<RowDataPacket[]>(
       "SELECT id, name, email, address, role FROM users WHERE id = ?",
       [userId]
     );
-    
-    return rows.length > 0 ? rows[0] as User : null;
+
+    return rows.length > 0 ? (rows[0] as User) : null;
   }
 
   // Get store ratings
   async getRatingByStore(storeId: string): Promise<any[]> {
     if (!this.db) throw new Error("Database not connected");
-    
+
     const [rows] = await this.db.execute<RowDataPacket[]>(
       `SELECT 
         r.*,
@@ -317,14 +401,14 @@ class StoreRating {
        ORDER BY r.created_at DESC`,
       [storeId]
     );
-    
+
     return rows;
   }
 
   // Get user ratings
   async getUserRatings(userId: number): Promise<any[]> {
     if (!this.db) throw new Error("Database not connected");
-    
+
     const [rows] = await this.db.execute<RowDataPacket[]>(
       `SELECT r.*, s.name as store_name 
        FROM ratings r 
@@ -332,38 +416,35 @@ class StoreRating {
        WHERE r.user_id = ?`,
       [userId]
     );
-    
+
     return rows;
   }
 
   // Get rating by ID
   async getRatingById(ratingId: number): Promise<any | null> {
     if (!this.db) throw new Error("Database not connected");
-    
+
     const [rows] = await this.db.execute<RowDataPacket[]>(
       "SELECT * FROM ratings WHERE id = ?",
       [ratingId]
     );
-    
+
     return rows.length > 0 ? rows[0] : null;
   }
 
   async updateUserRole(email: string, newRole: string): Promise<void> {
     if (!this.db) throw new Error("Database not connected");
-    
-    await this.db.execute(
-      "UPDATE users SET role = ? WHERE email = ?",
-      [newRole, email]
-    );
+
+    await this.db.execute("UPDATE users SET role = ? WHERE email = ?", [
+      newRole,
+      email,
+    ]);
   }
 
   async deleteUser(email: string): Promise<void> {
     if (!this.db) throw new Error("Database not connected");
-    
-    await this.db.execute(
-      "DELETE FROM users WHERE email = ?",
-      [email]
-    );
+
+    await this.db.execute("DELETE FROM users WHERE email = ?", [email]);
   }
 
   async getAllRatings(): Promise<any[]> {
@@ -374,9 +455,14 @@ class StoreRating {
     return rows;
   }
 
-  async getStoresWithRatings(filters?: { name?: string; address?: string; sortBy?: string; sortOrder?: 'ASC' | 'DESC' }): Promise<Store[]> {
+  async getStoresWithRatings(filters?: {
+    name?: string;
+    address?: string;
+    sortBy?: string;
+    sortOrder?: "ASC" | "DESC";
+  }): Promise<Store[]> {
     if (!this.db) throw new Error("Database not connected");
-    
+
     let query = `
       SELECT 
         s.*,
@@ -385,7 +471,7 @@ class StoreRating {
       FROM stores s
       LEFT JOIN ratings r ON s.id = r.store_id
     `;
-    
+
     const params: string[] = [];
     const conditions: string[] = [];
 
@@ -405,21 +491,24 @@ class StoreRating {
     query += ` GROUP BY s.id`;
 
     if (filters?.sortBy) {
-      query += ` ORDER BY ${filters.sortBy} ${filters.sortOrder || 'ASC'}`;
+      query += ` ORDER BY ${filters.sortBy} ${filters.sortOrder || "ASC"}`;
     }
 
     const [rows] = await this.db.execute<RowDataPacket[]>(query, params);
     return rows as Store[];
   }
 
-  async getUserStoreRating(userId: number, storeId: number): Promise<number | null> {
+  async getUserStoreRating(
+    userId: number,
+    storeId: number
+  ): Promise<number | null> {
     if (!this.db) throw new Error("Database not connected");
-    
+
     const [rows] = await this.db.execute<RowDataPacket[]>(
       "SELECT rating FROM ratings WHERE user_id = ? AND store_id = ?",
       [userId, storeId]
     );
-    
+
     return rows.length > 0 ? rows[0].rating : null;
   }
 
