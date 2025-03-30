@@ -22,6 +22,32 @@ A web application for rating and reviewing stores. Users can browse stores, leav
   VITE_API_URL=https://localhost:3001/
   ```
 
+## 🛠 Technologies Used
+
+### 🔹 **Frontend**
+- **Framework**: React (with TypeScript & Vite)
+- **State Management**: Context API
+- **Styling**: Tailwind CSS
+- **Routing**: React Router
+- **HTTP Requests**: Axios
+- **Authentication**: JWT-based authentication
+
+### 🔹 **Backend**
+- **Runtime**: Node.js
+- **Framework**: Express.js (with TypeScript)
+- **Database**: MySQL (via Avien)
+- **Authentication**: JWT & Bcrypt for hashing
+- **API Testing**: Postman
+
+### 🔹 **Deployment**
+- **Frontend**: Vercel
+- **Backend**: Render
+- **Database**: Avien
+
+---
+This project follows **MVC architecture** and ensures **secure authentication** using JWT and encrypted passwords. 🚀
+
+
 ## **Prerequisites**
 Ensure you have the following dependencies installed:
 - Node.js (v14 or higher)
