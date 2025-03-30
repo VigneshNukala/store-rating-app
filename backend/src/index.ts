@@ -13,22 +13,11 @@ import cors from 'cors';
 const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://store-rating-app-five.vercel.app/",
-];
-
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: "https://store-rating-app-five.vercel.app",
     credentials: true,
-    methods: "GET,POST,PUT,DELETE",
+    methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 app.use(cookieParser());
