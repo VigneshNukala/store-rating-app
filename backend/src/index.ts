@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3001;
 app.use(express.json());
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://your-frontend-url.com",
+  "https://store-rating-app-five.vercel.app/",
 ];
 
 app.use(
