@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import api from "../../utils/axios";
+
 
 const StoreRatings = () => {
   const { storeId } = useParams();
@@ -10,8 +11,8 @@ const StoreRatings = () => {
   useEffect(() => {
     const fetchRatings = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:3001/users/ratings/store/${storeId}`
+        const response = await api.get(
+          `/users/ratings/store/${storeId}`
         );
         setRatings(response.data.data);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars

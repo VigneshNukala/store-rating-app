@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../utils/axios";
 import { useNavigate } from "react-router-dom";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
@@ -20,8 +20,8 @@ const StoreList = () => {
   useEffect(() => {
     const fetchStores = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:3001/user/stores?name=${nameSearch}&address=${addressSearch}`,
+        const response = await api.get(
+          `/user/stores?name=${nameSearch}&address=${addressSearch}`,
           {
             withCredentials: true,
           }

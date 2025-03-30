@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../utils/axios";
 
 interface RatingStats {
   average_rating: number | null;
@@ -23,8 +23,8 @@ const StoreRatings = () => {
 
   const fetchRatings = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:3001/owner/average-rating",
+      const response = await api.get(
+        "/owner/average-rating",
         {
           withCredentials: true,
         }

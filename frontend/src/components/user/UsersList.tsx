@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../utils/axios";
 
 const UsersList = () => {
   interface User {
@@ -14,7 +14,7 @@ const UsersList = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/user/users", {
+        const response = await api.get("/user/users", {
           withCredentials: true,
         });
         setUsers(response.data.data);

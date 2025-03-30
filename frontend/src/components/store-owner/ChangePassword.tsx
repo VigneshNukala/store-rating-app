@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../utils/axios";
 import { LockClosedIcon } from "@heroicons/react/24/outline";
 
 const ChangePassword = () => {
@@ -22,8 +22,8 @@ const ChangePassword = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:3001/owner/update-password",
+      const response = await api.post(
+        "/owner/update-password",
         {
           email: formData.email,
           currentPassword: formData.currentPassword,

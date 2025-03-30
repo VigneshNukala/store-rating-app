@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/axios";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -7,8 +7,8 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       // Send a request to the backend to clear the cookie
-      await axios.post(
-        "http://localhost:3001/auth/logout", // Replace with your logout endpoint
+      await api.post(
+        "/auth/logout", // Replace with your logout endpoint
         {},
         { withCredentials: true }
       );

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import api from "../../utils/axios";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 interface User {
@@ -19,8 +19,8 @@ const UserList = () => {
   const fetchUsers = useCallback(async () => {
     try {
       setError("");
-      const response = await axios.get(
-        `http://localhost:3001/admin/users?name=${nameSearch}&role=${roleSearch}&email=${emailSearch}`,
+      const response = await api.get(
+        `admin/users?name=${nameSearch}&role=${roleSearch}&email=${emailSearch}`,
         {
           withCredentials: true,
         }

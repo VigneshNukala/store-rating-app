@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import api from "../../utils/axios";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 interface Store {
@@ -19,8 +19,8 @@ const StoresList = () => {
   const fetchStores = useCallback(async () => {
     try {
       setError("");
-      const response = await axios.get(
-        `http://localhost:3001/admin/stores?name=${search}&address=${address}`,
+      const response = await api.get(
+        `/admin/stores?name=${search}&address=${address}`,
         {
           withCredentials: true,
         }
@@ -85,13 +85,15 @@ const StoresList = () => {
           <div
             key={store.id}
             className={`${
-              index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+              index % 2 === 0 ? "bg-white" : "bg-gray-50"
             } overflow-hidden shadow-lg rounded-lg divide-y divide-gray-200 border-2 border-gray-200 hover:border-primary-500 transition-colors duration-200`}
           >
             <div className="px-4 py-5 sm:px-6">
               <h3 className="text-lg font-medium leading-6 text-gray-900 flex items-center justify-between">
                 {store.name}
-                <span className="text-sm bg-gray-100 px-2 py-1 rounded-full">#{store.id}</span>
+                <span className="text-sm bg-gray-100 px-2 py-1 rounded-full">
+                  #{store.id}
+                </span>
               </h3>
               <p className="mt-1 text-sm text-gray-500">{store.email}</p>
             </div>

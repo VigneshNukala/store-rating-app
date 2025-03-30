@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { motion } from "framer-motion";
+import api from "../../utils/axios";
 
 interface Stats {
   totalUsers: number;
@@ -17,7 +17,7 @@ const Statistics: React.FC = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/admin/stats", {
+        const response = await api.get("/admin/stats", {
           withCredentials: true,
         });
         setStats(response.data.data);

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../utils/axios";
 
 interface Store {
   id: number;
@@ -22,10 +22,10 @@ const UpdateRating = () => {
     const fetchData = async () => {
       try {
         const [storeResponse, ratingResponse] = await Promise.all([
-          axios.get(`http://localhost:3001/user/stores/${id}`, {
+          api.get(`/user/stores/${id}`, {
             withCredentials: true,
           }),
-          axios.get(`http://localhost:3001/user/rating/${id}`, {
+          api.get(`/user/rating/${id}`, {
             withCredentials: true,
           }),
         ]);
@@ -43,8 +43,8 @@ const UpdateRating = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.patch(
-        `http://localhost:3001/user/rating/${id}`,
+      await api.post(
+        `/user/rating/${id}`,
         { rating },
         { withCredentials: true }
       );
@@ -61,7 +61,7 @@ const UpdateRating = () => {
   return (
     <div className="max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Update Rating</h2>
-      
+
       {error && (
         <div className="rounded-md bg-red-50 p-4 mb-6">
           <p className="text-sm text-red-700">{error}</p>
@@ -76,7 +76,9 @@ const UpdateRating = () => {
       {store && (
         <div className="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg p-6">
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">{store.name}</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              {store.name}
+            </h3>
             <p className="mt-1 text-gray-600">{store.address}</p>
             {currentRating && (
               <p className="mt-2 text-sm font-medium text-gray-500">
@@ -97,7 +99,7 @@ const UpdateRating = () => {
               >
                 {[1, 2, 3, 4, 5].map((num) => (
                   <option key={num} value={num}>
-                    {num} {num === 1 ? 'Star' : 'Stars'}
+                    {num} {num === 1 ? "Star" : "Stars"}
                   </option>
                 ))}
               </select>

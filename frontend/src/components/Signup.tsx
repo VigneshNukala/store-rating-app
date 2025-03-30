@@ -1,6 +1,6 @@
-import axios from "axios";
+import api from "../utils/axios";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Added import
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -9,12 +9,12 @@ const Signup = () => {
   const [address, setAddress] = useState("");
   const [role, setRole] = useState("");
 
-  const navigate = useNavigate(); // Added useNavigate hook
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:3001/auth/signup", {
+      const response = await api.post("/auth/signup", {
         name,
         email,
         password,
@@ -22,7 +22,7 @@ const Signup = () => {
         role,
       });
       console.log("Signup successful:", response.data);
-      navigate("/signin"); // Navigate to Sign In page after successful signup
+      navigate("/signin"); 
     } catch (error) {
       console.error("Error during signup:", error);
     }

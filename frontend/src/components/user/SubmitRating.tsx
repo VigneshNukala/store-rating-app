@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../utils/axios";
 
 interface Store {
   id: number;
@@ -20,13 +20,9 @@ const SubmitRating = () => {
   useEffect(() => {
     const fetchStoreDetails = async () => {
       try {
-        console.log(id);
-        const response = await axios.get(
-          `http://localhost:3001/user/stores/${id}`,
-          {
-            withCredentials: true,
-          }
-        );
+        const response = await api.get(`/user/stores/${id}`, {
+          withCredentials: true,
+        });
         setStore(response.data.data);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
@@ -40,8 +36,8 @@ const SubmitRating = () => {
     e.preventDefault();
     console.log("Submitting rating for store ID:", id, "with rating:", rating); // Log the request details
     try {
-      await axios.post(
-        "http://localhost:3001/user/rating",
+      await api.post(
+        "/user/rating",
         {
           storeId: id,
           rating,
