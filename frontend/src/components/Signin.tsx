@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../utils/axios"
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRole } from "../context/RoleContext";
