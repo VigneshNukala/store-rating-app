@@ -53,9 +53,8 @@ const Signin = () => {
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
+        console.error("Error during signin:", error);
         setError(error.response.data.message);
-      }
-      console.error("Error during signin:", error);
     } finally {
       setLoading(false);
     }
