@@ -18,7 +18,7 @@ const Signin = () => {
     password: string;
   }) => {
     try {
-      const response = await axios.post(
+      const response = await api.post(
         "/auth/signin",
         credentials,
         { withCredentials: true }
@@ -51,11 +51,9 @@ const Signin = () => {
           navigate("/owner"); // Changed from /owner to /store-owner
         }
       }
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error) && error.response?.data?.message) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
         setError(error.response.data.message);
-      } else {
-        setError("Invalid username or password");
       }
       console.error("Error during signin:", error);
     } finally {
