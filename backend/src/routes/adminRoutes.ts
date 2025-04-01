@@ -1,9 +1,9 @@
 import express, { Request, Response, Router } from "express";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
-import { database } from "../db/db.js";
-import { success, error, ApiResponse } from "../utils.js";
-import { authenticateToken } from "../middleware/authMiddleware.js";
+import { database } from "../db/db";
+import { success, error, ApiResponse } from "../utils";
+import { authenticateToken } from "../middleware/authMiddleware";
 
 dotenv.config();
 
